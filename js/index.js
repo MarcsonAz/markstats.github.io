@@ -75,7 +75,7 @@ function f3(data) {
     let dadosG = []
 
     // criar o dados 
-    for (let i = 1; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         dadosG.push(prepTrace(data[i].info, 'Data', i, data[i].name))
             // array com dados, Data ou Dia, index, nome do pais para legenda
     }
@@ -83,7 +83,7 @@ function f3(data) {
     Plotly.newPlot(document.getElementById('tester2'), dadosG, { title: 'Casos de COVID-19 nos Países acima desde o dia 22/01' });
     //console.log(dadosG)
     dadosG = []
-    for (let i = 1; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         dadosG.push(prepTrace(data[i].info, 'Dia', i, data[i].name))
             // array com dados, Data ou Dia, index, nome do pais para legenda
     }

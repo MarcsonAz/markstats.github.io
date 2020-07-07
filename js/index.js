@@ -6,10 +6,10 @@ var casos = []
 var mostrarpais = []
 var mostrarid = ['global', 'primeiro', 'segundo', 'terceiro', 'quarto', 'quinto', 'sexto', 'setimo']
     // rgb em seq com os cards
-var cor = ['rgb(60, 143, 60)','rgb(0, 123, 255)','rgb(108, 117, 125)','rgb(23, 162, 184)',
-            'rgb(255, 193, 7)','rgb(220, 53, 69)','rgb(52, 58, 64)']
+var cor = ['rgb(60, 143, 60)','rgb(0, 123, 255)','rgb(108, 117, 125)','rgb(255, 193, 7)',
+'rgb(52, 58, 64)','rgb(220, 53, 69)','rgb(23, 162, 184)']
 var id = ''
-var found, index, card, obj, iniciocontagem = 100
+var found, index, card, obj, remover = ['primeiro'], iniciocontagem = 1000
 
 function range(fim) {
     let array = []
@@ -31,7 +31,7 @@ function depoisNcaso(data, num) {
     })
 
     let menorarray = []
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < data.length; i++) {
         menorarray.push(data[i].y.length)
     }
     menorarray.sort(function(a, b) { return a - b })
@@ -71,6 +71,17 @@ function prepTrace(array, eixo, index, nome) {
 
 }
 
+function toDaily(array) {
+    let day, newArray = [{'Casos': 0}];
+    for ( var i = 0; i < array.length; i++ ) {
+        if (i > 0 ) {
+            day = array[i].Casos - array[i-1].Casos
+            newArray.push({'Casos':day > 0 ? day : 0})
+        }
+    }
+    return newArray
+}
+
 function f3(data) {
     let dadosG = []
 
@@ -79,7 +90,7 @@ function f3(data) {
         dadosG.push(prepTrace(data[i].info, 'Data', i, data[i].name))
             // array com dados, Data ou Dia, index, nome do pais para legenda
     }
-    //PRIMEIRO GRAFICO
+    //Segundo GRAFICO
     Plotly.newPlot(document.getElementById('tester2'), dadosG, { title: 'Casos de COVID-19 nos Países acima desde o dia 22/01' });
     //console.log(dadosG)
     dadosG = []
@@ -117,7 +128,46 @@ function f3(data) {
 
 
     //console.log(dadosG)
+    // PRIMEIRO GRAFICO
     Plotly.newPlot(document.getElementById('tester'), dadosG,layout);
+}
+
+// Grafico de casos diarios
+function dailyPlot(data) {
+    data.forEach(obj => {
+        obj.casosarray = toDaily(obj.casosarray)
+    })  // dados vem acumulados, passar para dados diarios
+
+    let newArray = []
+    data.forEach((obj,index) => {
+        newArray.push( prepTrace(obj.casosarray, 'Dia', index, obj.pais) )
+    })
+    console.log(newArray)
+    // edit layout
+    var layout = {
+        title: ` Casos diários da Pandemia de COVID-19 no Brasil a partir de 1000 casos confirmados`,
+        annotations: [
+          {
+            xref: 'paper',
+            yref: 'paper',
+            x: 50,
+            y: -10,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: 'Source: Pew Research Center & Storytelling with data',
+            showarrow: false,
+            font: {
+              family: 'Arial',
+              size: 12,
+              color: 'rgb(150,150,150)'
+            }
+          }
+        ]
+      };
+
+
+    //console.log(dadosG)
+    Plotly.newPlot(document.getElementById('tester3'), newArray, layout);
 }
 
 // CARDS
@@ -149,10 +199,12 @@ function f4(dados) {
 
 
 // FUNCOES PARA CARREGAR OS DADOS
-var tmp, tmp2, tmp3, tmp4
+var tmp, tmp2, tmp3, tmp4, tmp5
 var url
 const summaryUrl = 'https://api.covid19api.com/summary'
 const totalUrl = 'https://api.covid19api.com/total/country/'
+const daily = 'https://api.covid19api.com/total/country/'
+const dailyCountries = ['brazil','italy','spain','india']
     //const casosUrl = '/status/confirmed'
     //const mortesUrl = '/status/deaths'
 var newObj = []
@@ -163,6 +215,21 @@ async function fetchApi(endpoint) {
     const data = await res.json()
     return data
 }
+
+function filterdaily(data,vars,afterN) {
+    let array, pais, newData = [], newArray = []
+    for(var i=0;i < data.length;i++) {
+        array = data[i] // para cada pais
+        array.forEach(obj => {
+            if(obj[vars[0]] > afterN) newData.push({'Casos' :  obj[vars[0]]})
+        })
+        pais = array[0].Country
+        newArray.push({pais,'casosarray' : newData})
+        newData = []
+    }
+    
+    return newArray
+};
 
 function top7Casos(dados) {
     let newArray = []
@@ -211,7 +278,7 @@ async function f2(data) {
 }
 
 async function f1() {
-    let response
+    let response, data = []
     response = await fetchApi(summaryUrl)
     let Cc = top7Casos(response.Countries)
     Cc.unshift({
@@ -221,8 +288,18 @@ async function f1() {
         'Date': response.Date
     })
     tmp2 = f2({ 'Countries': Cc })
-}
 
+    // dados diarios
+    for (var i=0; i < dailyCountries.length; i++) {
+        response =  await fetchApi(daily+dailyCountries[i])
+        data.push(response)
+    }
+    
+    // filterData
+    data = filterdaily(data,['Confirmed'],1000)
+    tmp5 = dailyPlot(data);
+}
+ 
 // chamada de funcoes ao iniciar
 function eventos() {
     tmp = setTimeout(f1, 100);

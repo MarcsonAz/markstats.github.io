@@ -1,15 +1,65 @@
+/// vars
+const seq = ['primeiro', 'segundo', 'terceiro', 'quarto', 'quinto', 'sexto', 'setimo']
+const mesDoAno = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 
+                  'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+const summaryUrl = 'https://api.covid19api.com/summary'
+const baseUrl = 'https://api.covid19api.com/total/country/'
+
+
 // FUNCOES PARA TRATAR E APLICAR OS DADOS
 var array = []
 var x = []
 var y = []
 var casos = []
 var mostrarpais = []
-var mostrarid = ['global', 'primeiro', 'segundo', 'terceiro', 'quarto', 'quinto', 'sexto', 'setimo']
+
     // rgb em seq com os cards
 var cor = ['rgb(60, 143, 60)','rgb(0, 123, 255)','rgb(108, 117, 125)','rgb(255, 193, 7)',
 'rgb(52, 58, 64)','rgb(220, 53, 69)','rgb(23, 162, 184)']
 var id = ''
 var found, index, card, obj, remover = ['primeiro'], iniciocontagem = 1000
+
+// FUNCOES PARA CARREGAR OS DADOS
+var tmp, tmp2, tmp3, tmp4, tmp5
+var url, countryCards = 7
+
+
+//const dailyCountries = ['brazil','italy','spain','india']
+    //const casosUrl = '/status/confirmed'
+    //const mortesUrl = '/status/deaths'
+var newObj = []
+var graficoData = []
+
+
+
+
+
+/// Helper functions
+async function fetchApi(endpoint) {
+    const res = await fetch(endpoint)
+    const data = await res.json()
+    return data
+}
+
+function addLetal(obj) {
+    obj['letal'] = (obj.TotalDeaths / obj.TotalConfirmed * 100).toFixed(2) + '%'
+    return obj
+}
+
+function clean(array,itemsToKeep) { // editing...
+    let newArray = [];
+    array.forEach(obj => {
+        newArray.push(
+            {
+               'Country'   : obj.Country,
+               'Confirmed' : obj.Confirmed,
+               'Deaths'    : obj.Deaths,
+               'Date'      : obj.Date
+            }
+        )
+    })
+    return newArray
+}
 
 function range(fim) {
     let array = []
@@ -19,56 +69,53 @@ function range(fim) {
     return array
 }
 
-function depoisNcaso(data, num) {
-    data.forEach(obj => {
-        found = obj.y.find(function(element) { return element >= num })
-        index = obj.y.indexOf(found)
-        for (let i = 0; i < index; i++) {
-            obj.x.shift()
-            obj.y.shift()
-        }
-
-    })
-
+function sameSizeTrace(data) {
     let menorarray = []
-    for (let i = 0; i < data.length; i++) {
-        menorarray.push(data[i].y.length)
-    }
-    menorarray.sort(function(a, b) { return a - b })
 
-    data.forEach(obj => {
-        obj.x = range(menorarray[0])
+    data.forEach(obj =>  { // pegar a qtd de dias em cada pais
+        menorarray.push(obj.y.length)
+    });
+
+    menorarray.sort(function(a, b) { return a - b }) // ordenar
+
+    data.forEach(obj => {   // eliminar dias a mais q o pais com menos dias
+        obj.x = range(menorarray[0])   
         obj.y.splice(menorarray[0])
     })
-    return [data, menorarray[0]]
+    return data
 }
 
-
-function prepTrace(array, eixo, index, nome) {
+function prepTrace(array, eixoX, index) {
+    //console.log(array)
+    if(!(eixoX == 'Dia' | eixoX == 'Data')) return `o Eixo de 'X' = ${eixoX} é uma informacao inválida, opções: {'Dia' ou 'Data'}`
     let dia
     let trace = {
         x: [], //'Array com data ou dias'
         y: [], //'Array com casos'
         mode: 'lines',
-        name: nome,
+        name: array[0].Country,
         line: { color: cor[index], width: 3 }
     }
-    if (eixo == 'Dia') {
+    if (eixoX == 'Dia') {
+        //saida = depoisNcaso(dadosG, iniciocontagem)
         dia = 1
+        //iniciocontagem = 1 // comentado para ser inicio contagem geral
         array.forEach(obj => {
-            trace.x.push(dia++)
-            trace.y.push(obj.Casos)
+            if(obj.Confirmed > iniciocontagem) {
+                trace.x.push(dia++)
+                trace.y.push(obj.Confirmed)
+            }
         })
     }
-
-    if (eixo === 'Data') {
+    if (eixoX === 'Data') {
         array.forEach(obj => {
-            trace.x.push(obj.Data)
-            trace.y.push(obj.Casos)
+            if(obj.Date >= '2020-03-15'){  // fixei os dados a partir de 15 de março
+                trace.x.push(obj.Date)
+                trace.y.push(obj.Confirmed)
+            }
         })
     }
     return trace
-
 }
 
 function toDaily(array) {
@@ -82,54 +129,114 @@ function toDaily(array) {
     return newArray
 }
 
-function f3(data) {
-    let dadosG = []
-
-    // criar o dados 
-    for (let i = 0; i < 7; i++) {
-        dadosG.push(prepTrace(data[i].info, 'Data', i, data[i].name))
-            // array com dados, Data ou Dia, index, nome do pais para legenda
+function filterdaily(data,vars,afterN) {
+    let array, pais, newData = [], newArray = []
+    for(var i=0;i < data.length;i++) {
+        array = data[i] // para cada pais
+        array.forEach(obj => {
+            if(obj[vars[0]] > afterN) newData.push({'Casos' :  obj[vars[0]]})
+        })
+        pais = array[0].Country
+        newArray.push({pais,'casosarray' : newData})
+        newData = []
     }
-    //Segundo GRAFICO
-    Plotly.newPlot(document.getElementById('tester2'), dadosG, { title: 'Casos de COVID-19 nos Países acima desde o dia 22/01' });
-    //console.log(dadosG)
-    dadosG = []
-    for (let i = 0; i < 7; i++) {
-        dadosG.push(prepTrace(data[i].info, 'Dia', i, data[i].name))
-            // array com dados, Data ou Dia, index, nome do pais para legenda
+    return newArray
+};
+
+function topCasos(dados,n) { // fixado n = 7 
+    let newArray = []
+    dados.forEach(function(obj) {
+            newArray.push(obj)
+            if (newArray.length > n) {
+                newArray.sort(function(a, b) { return b.TotalConfirmed - a.TotalConfirmed })
+                newArray.pop()
+            }
+        })
+    for(let i=0; i<newArray.length; i++) {
+        newArray[i]['order'] = seq[i]
     }
-    // correcao para pais com menos dias de pandemia 
-    saida = depoisNcaso(dadosG, iniciocontagem)
-    dadosG = saida[0]
-    //console.log(dadosG)
+    return newArray
+}
 
-    // edit layout
+function showCard(array) {
+    array.forEach(obj => {
+        obj = addLetal(obj)
+        if (obj.order !== 'global') { // pois Global nao tem o nome na base
+            card = document.getElementById(obj.order)
+            card.textContent = obj.Country
+        }
+        
+        card = document.getElementById(obj.order + 'casos')
+        card.className += "float-right";
+        card.textContent = obj.TotalConfirmed.toLocaleString()
+        card = document.getElementById(obj.order + 'mortes')
+        card.className += "float-right";
+        card.textContent = obj.TotalDeaths.toLocaleString()
+        card = document.getElementById(obj.order + 'letal')
+        card.className += "float-right";
+        card.textContent = obj.letal
+    })
+}
 
-    var layout = {
-        title: `Primeiros ${saida[1]} dias de Pandemia nos Países a partir de ${iniciocontagem} Caso(s)`,
+async function delay(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+}
+// handle with steps to lazy load data 
+async function dadosGrafico(data) {
+    let array, time = 150, slug, saida = []
+    for (let l = 0; l < data.length; l ++) {
+        slug = data[l].Slug;
+        await delay(time); // carregar dados com espaco de tempo 
+        array = await fetchApi(baseUrl+slug);
+        saida.push(array)
+        array = []
+    }
+    return(saida)
+}
+
+
+ 
+
+///   ----  ACTIVITY FUNCTIONS   ----
+
+function fullPlot(countryArray) {
+    //console.log(data)
+    let dia, mes, plotData = [], eixoX = 'Data' // Data ou Dia
+    // load the graph traces
+    for (let i = 0; i < countryArray.length; i++) { 
+        // i indice do array de informacoes de cada pais
+        plotData.push(prepTrace(countryArray[i], eixoX, i))
+    }
+    let datainicio = new Date(plotData[0].x[0]) // data de inicio do gráfico
+    dia = datainicio.getDate()+1
+    mes = mesDoAno[datainicio.getMonth()]
+    Plotly.newPlot(document.getElementById('tester1'), 
+        plotData, 
+        { title: `Casos de COVID-19 nos Países destacados, desde o dia ${dia} de ${mes}` }
+    );
+}
+
+/// handle plots
+function comparedPlot(data) {
+    let layout, dias, dadosG = []
+    for (let i = 0; i < data.length; i++) {
+        dadosG.push(prepTrace(data[i], 'Dia', i))
+    }
+    dadosG = sameSizeTrace(dadosG);  // correcao para pais com menos dias de pandemia
+    dias = dadosG[0].x.length
+    layout = {
+        title: `Dados a partir de ${iniciocontagem} Casos dos primeiros ${dias} dias de Pandemia nos Países destacados`,
         annotations: [
           {
-            xref: 'paper',
-            yref: 'paper',
-            x: 50,
-            y: -10,
-            xanchor: 'center',
-            yanchor: 'top',
-            text: 'Source: Pew Research Center & Storytelling with data',
-            showarrow: false,
-            font: {
-              family: 'Arial',
-              size: 12,
-              color: 'rgb(150,150,150)'
-            }
+            xref: 'paper', yref: 'paper', x: 50, y: -10, xanchor: 'center', yanchor: 'top',
+            text: 'Source: World Metter, JHU', showarrow: false,
+            font: {family: 'Arial', size: 12, color: 'rgb(150,150,150)'}
           }
         ]
       };
-
-
-    //console.log(dadosG)
-    // PRIMEIRO GRAFICO
-    Plotly.newPlot(document.getElementById('tester'), dadosG,layout);
+    Plotly.newPlot(document.getElementById('tester2'), dadosG, layout);
 }
 
 // Grafico de casos diarios
@@ -170,82 +277,130 @@ function dailyPlot(data) {
     Plotly.newPlot(document.getElementById('tester3'), newArray, layout);
 }
 
-// CARDS
-function f4(dados) {
-    // cards
-    console.log(dados)
-    mostrarpais.push(...dados.Ordem)
-        // definir letalidade
-    dados.Countries.forEach(obj => {
-        obj['letal'] = (obj.TotalDeaths / obj.TotalConfirmed * 100).toFixed(2) + '%'
-    })
-    for (let index in mostrarid) {
-        obj = dados.Countries[index]
-        if (index > 0) { // pois Global nao tem o nome na base
-            card = document.getElementById(mostrarid[index])
-            card.textContent = obj.Country
-        }
-        card = document.getElementById(mostrarid[index] + 'casos')
-        card.className += "float-right";
-        card.textContent = obj.TotalConfirmed.toLocaleString()
-        card = document.getElementById(mostrarid[index] + 'mortes')
-        card.className += "float-right";
-        card.textContent = obj.TotalDeaths.toLocaleString()
-        card = document.getElementById(mostrarid[index] + 'letal')
-        card.className += "float-right";
-        card.textContent = obj.letal
-    }
-}
 
 
-// FUNCOES PARA CARREGAR OS DADOS
-var tmp, tmp2, tmp3, tmp4, tmp5
-var url
-const summaryUrl = 'https://api.covid19api.com/summary'
-const totalUrl = 'https://api.covid19api.com/total/country/'
-const daily = 'https://api.covid19api.com/total/country/'
-const dailyCountries = ['brazil','italy','spain','india']
-    //const casosUrl = '/status/confirmed'
-    //const mortesUrl = '/status/deaths'
-var newObj = []
-var graficoData = []
+/// Funcao principal
+async function main() {
+    let response, data, graficoData = [], CardsInfo = []
 
-async function fetchApi(endpoint) {
-    const res = await fetch(endpoint)
-    const data = await res.json()
-    return data
-}
+    // GET the list of basic, daily, light Country data
+    response = await fetchApi(summaryUrl)
 
-function filterdaily(data,vars,afterN) {
-    let array, pais, newData = [], newArray = []
-    for(var i=0;i < data.length;i++) {
-        array = data[i] // para cada pais
-        array.forEach(obj => {
-            if(obj[vars[0]] > afterN) newData.push({'Casos' :  obj[vars[0]]})
-        })
-        pais = array[0].Country
-        newArray.push({pais,'casosarray' : newData})
-        newData = []
-    }
+    // filtrar top 7 em casos e aribuir ordem
+    let CountriesInfo = topCasos(response.Countries,n = countryCards)
+    CardsInfo.push(...CountriesInfo)
     
-    return newArray
+    // add global
+    response.Global['order'] = 'global'
+    CardsInfo.push(response.Global)
+    
+    //showCard() printar card
+    showCard(CardsInfo) // global + 7 paises com mais casos
+    
+    // Carregar dados do grafico de forma lenta
+    data = await dadosGrafico(CountriesInfo) 
+    
+    /// 4 Graficos: 
+    // Casos acumulados nos 7 paises por data
+    
+    fullPlot(data) 
+    // Country, Confirmed, Date
+
+    // Casos acumulados nos 7 paises a partir de 1000 casos acumulados
+    comparedPlot(data)
+
+    // Casos diarios nos 7 paises por data
+    // Mortes diarias nos 7 paises por data
+
+}
+ 
+// chamada de funcoes ao iniciar
+function eventos() {
+    tmp = setTimeout(main, 100);
 };
 
-function top7Casos(dados) {
-    let newArray = []
-    dados.forEach(function(obj) {
-            newArray.push(obj)
-            if (newArray.length > 7) {
-                newArray.sort(function(a, b) { return b.TotalConfirmed - a.TotalConfirmed })
-                newArray.pop()
-            }
-        })
-        //newArray.unshift(dados.filter(obj => obj.Slug === 'brazil')[0])  adicionar Brasil
-    return newArray
-}
+window.addEventListener("load", eventos);
 
 
-async function f2(data) {
+/*
+    // dados diarios
+    for (var i=0; i < dailyCountries.length; i++) {
+        response =  await fetchApi(daily+dailyCountries[i])
+        data.push(response)
+    }
+    
+    // filterData
+    data = filterdaily(data,['Confirmed'],iniciocontagem)
+   // tmp5 = dailyPlot(data);
+
+*/
+
+/* comentado  
+    let readData, gData = []
+    for(r in seq) { // r = 0 e seq[r] = primeiro
+        let {Slug} = data[r]
+    // load data
+        readData = await fetchApi('https://api.covid19api.com/country/'+Slug)
+    // clean and fill graphData     
+        await setTimeout( () => {
+            gData.push(
+                {
+                'order' : seq[r],
+                'data': clean(readData)
+                }
+            )
+        }, 100);
+
+    }
+    console.log(gData);
+    return(gData)
+
+async function f2(data) {  
+    let gData = []
+    //console.log(data)
+    for(r in seq) { // r = 0 e seq[r] = primeiro
+        let [{Slug}] = data
+    // load data
+    
+        readData = 
+    // reduzir o tamanho de data
+    //console.log(readData);
+        /
+    
+    // delay then over and over
+    setTimeout(150)
+    }
+
+} 
+
+
+    // load data
+    // filter data size
+    // fill finalObj
+    // delay then over and over
+
+    // loop para todos os paises
+
+     // load data slowly 
+     CountriesInfo.forEach(obj => {
+        if(obj.order !== 'global') {
+            setTimeout(
+                data = await fetchApi(baseUrl+obj.Slug)
+            ,150)
+
+            // reduzir o tamanho de data
+            data = pocketSize(data)
+            graficoData.push(
+                {
+                    'order' : obj.order,
+                    'data': data
+                }
+            )
+
+            data = []
+        }
+    })
+
     // pegar os paises para recolher os dados do Historico
     let pais = []
     let response, thisCountry, trace, obj
@@ -261,55 +416,21 @@ async function f2(data) {
         if (pais[i] !== 'global') {
             url = totalUrl + pais[i] // + casosUrl response.length-1
             response = await fetchApi(url);
-            //console.log(response)
+            console.log(response)
             for (let k = 0; k < response.length - 1; k++) {
                 obj = response[k]
                 trace.push({ 'Data': obj.Date, 'Casos': obj.Confirmed, 'Mortos': obj.Deaths })
             }
             thisCountry['info'] = trace
-            thisCountry['name'] = response[0].Country
+            thisCountry['name'] = response[0]['Country']
         }
-        graficoData.push(thisCountry)
+       // graficoData.push(thisCountry)
     }
-    graficoData.shift()
+    //graficoData.shift()
         //console.log(graficoData)
-    tmp3 = f3(graficoData)
-    tmp4 = f4(data)
-}
-
-async function f1() {
-    let response, data = []
-    response = await fetchApi(summaryUrl)
-    let Cc = top7Casos(response.Countries)
-    Cc.unshift({
-        'Slug': 'global',
-        'TotalConfirmed': response.Global.TotalConfirmed,
-        'TotalDeaths': response.Global.TotalDeaths,
-        'Date': response.Date
-    })
-    tmp2 = f2({ 'Countries': Cc })
-
-    // dados diarios
-    for (var i=0; i < dailyCountries.length; i++) {
-        response =  await fetchApi(daily+dailyCountries[i])
-        data.push(response)
-    }
-    
-    // filterData
-    data = filterdaily(data,['Confirmed'],1000)
-    tmp5 = dailyPlot(data);
-}
- 
-// chamada de funcoes ao iniciar
-function eventos() {
-    tmp = setTimeout(f1, 100);
-};
-
-window.addEventListener("load", eventos);
-
-
-
-
+    //tmp3 = f3(graficoData)
+    //tmp4 = f4(data) 
+*/
 
 /*parte do bloco e botoes
 var btn;

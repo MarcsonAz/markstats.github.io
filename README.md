@@ -20,6 +20,6 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 
 ## 📝 Licença
 
-Esse projeto está sob licença ![lic](https://img.shields.io/github/license/MarcsonAz/markstats.github.io) .
+![lic](https://img.shields.io/github/license/MarcsonAz/markstats.github.io)
 
 [⬆ Voltar ao topo](#PAINEL-COVID-19)<br>

@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<!-- load libraries -->
+<script src="js/index.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/plotly-latest.min.js"></script>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+<!-- header -->
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">SMARTEAGLE  --  Painel Covid-19</a>
+  </nav>
+    
+<!-- Cards -->
+
+
+<div class="container">
+    <h5 class="display-8 mt-3 mb-3">Estado da Doença no Mundo, no Brasil e em Países com mais Casos Confirmados:</h5>
+    <div class="row mt-3 mb-3">
+        <div class="col">
+        <div class="card-deck">
+            <div class="card">
+              <div class="card-body">
+                <p id="global" class="card-title">Global</p>
+                <a id="globalcasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="globalmortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="globalletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>
+
+            <div class="card border-success">
+              <div class="card-body">
+                <p id="primeiro" class="card-title">primeiro</p>
+                <a id="primeirocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="primeiromortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="primeiroletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>
+
+            <div class="card border-primary">
+              <div class="card-body">
+                <p id="segundo" class="card-title">segundo</p>
+                <a id="segundocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="segundomortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="segundoletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>
+
+            <div class="card border-secondary">
+              <div class="card-body">
+                <p id="terceiro" class="card-title">terceiro</p>
+                <a id="terceirocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="terceiromortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="terceiroletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+  <!--  segunda linha -->
+  <div class="row mt-3 mb-3">
+    <div class="col">
+      <div class="card-deck">
+        <div class="card border-info">
+            <div class="card-body">
+                <p id="quarto" class="card-title">quarto</p>
+                <a id="quartocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="quartomortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="quartoletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+            </div>
+        </div>
+
+            <div class="card border-warning">
+              <div class="card-body">
+                <p id="quinto" class="card-title">quinto</p>
+                <a id="quintocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="quintomortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="quintoletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>
+
+            <div class="card border-danger">
+              <div class="card-body">
+                <p id="sexto" class="card-title">sexto</p>
+                <a id="sextocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="sextomortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="sextoletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>
+
+            <div class="card border-dark">
+              <div class="card-body">
+                <p id="setimo" class="card-title">setimo</p>
+                <a id="setimocasos">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Casos Confirmados:</p>
+                <a id="setimomortes">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Mortes:</p>
+                  <a id="setimoletal">
+                  <div class="spinner-grow spinner-grow-sm float-right text-primary" role="status"><span class="sr-only">Loading...</span> </div> 
+                </a>
+                <p class="card-text">Letalidade:</p>                  
+              </div>
+            </div>   
+                 
+           
+      </div>
+    </div>
+</div>
+
+<div>
+  <p>
+    Edouard Mathieu, Hannah Ritchie, Lucas Rodés-Guirao, Cameron Appel, Charlie Giattino, Joe Hasell, Bobbie Macdonald, Saloni Dattani, Diana Beltekian, Esteban Ortiz-Ospina and Max Roser (2020)
+    "Coronavirus Pandemic (COVID-19)". Published online at OurWorldinData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
+  </p>
+</div>
+
+
+<!-- Graficos -->
+    <div class="wrapper">
+        <div id="tester1" style="width:840px;height:420px;"></div>
+    </div>
+
+    <div class="col-md-4 col-md-offset-2">
+      <div id="tester2" style="width:840px;height:420px;"></div>
+    </div>
+
+    <div class="col-md-4 col-md-offset-2">
+      <div id="tester3" style="width:840px;height:420px;"></div>
+    </div>
+
+    <div class="col-md-4 col-md-offset-2">
+      <div id="tester4" style="width:840px;height:420px;"></div>
+    </div>
+<!--
+<a>         OBS: Estados Unidos removido, pois a distancia entre o numero de casos atrapalharia a visualizacao dos dados. </a> -->
+  
+   
+</hr>
+</body>
+<!-- footer -->
+<footer>
+  <div class="container">
+  <ul>
+    <a> Fonte: </a>
+    <a href="https://documenter.getpostman.com/view/10808728/SzS8rjbc?version=latest#6fbc46d6-0ddf-400b-a743-a149e9bba381"> Coronavirus COVID19 API </a>
+  </ul>
+
+  </div>
+        
+</footer>
+</html>

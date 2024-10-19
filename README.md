@@ -6,6 +6,17 @@
 ![GitHub language count](https://img.shields.io/github/languages/count/MarcsonAz/markstats.github.io)
 ![GitHub forks](https://img.shields.io/github/forks/MarcsonAz/markstats.github.io)
 
+
+## Atualizado
+
+O projeto perdeu o sentido quando não há mais relevância no acompanhmento dos caso da doença e a API foi desabilitada. Hoje a página redireciona para o portal da https://ourworldindata.org/coronavirus.
+
+Print da Página.
+
+<img src="image_cover_owid.png" alt="exemplo2 imagem">
+
+## Versão antiga
+
 > O projeto mostra capacidade de desenvolvimento simples em HTML/CSS e operações de coletas de dados de APIs, tratamentos e visualizações de dados em Javascript para cards e gráficos de série de tempo. Com o carregamento de pacotes e edição de funcões para ajuste visual das informações.
 
 <img src="image.png" alt="exemplo imagem">
